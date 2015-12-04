@@ -4,3 +4,5 @@ htmlcov/
 doc/_build/
 dist/
 .coverage
+*.pyc
+.idea/

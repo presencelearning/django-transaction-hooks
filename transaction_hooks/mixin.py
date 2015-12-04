@@ -1,3 +1,6 @@
+from django.db import transaction
+
+
 class TransactionHooksDatabaseWrapperMixin(object):
     """
     A ``DatabaseWrapper`` mixin to implement transaction-committed hooks.
@@ -23,7 +26,8 @@ class TransactionHooksDatabaseWrapperMixin(object):
         super(TransactionHooksDatabaseWrapperMixin, self).__init__(*a, **kw)
 
     def on_commit(self, func):
-        if self.in_atomic_block:
+        if self.in_atomic_block \
+            or (not transaction.get_autocommit() and transaction.is_dirty()): # for  backward compatibility with old transaction system
             # transaction in progress; save for execution on commit
             self.run_on_commit.append((self.savepoint_ids[:], func))
         else:
